@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"myarchiver/lib/vlc"
@@ -16,7 +15,7 @@ const (
 	packedExtension = "vlc"
 )
 
-var vlcCmd = &cobra.Command{
+var vlcPackCmd = &cobra.Command{
 	Use:   "vlc",
 	Short: "Pack file using variable-length code",
 	Run:   pack,
@@ -24,7 +23,7 @@ var vlcCmd = &cobra.Command{
 
 func pack(_ *cobra.Command, args []string) {
 	if len(args) == 0 || args[0] == "" {
-		HandleErr(errors.New("path to file is not specified"))
+		HandleErr(ErrEmptyPath)
 	}
 	filePath := args[0]
 	r, err := os.Open(filePath)
@@ -37,17 +36,19 @@ func pack(_ *cobra.Command, args []string) {
 		HandleErr(err)
 	}
 	packed := vlc.Encode(string(data))
-	err = os.WriteFile(packedFileName(filePath), []byte(packed), 0644)
+	err = os.WriteFile(FileName(filePath, packedExtension), []byte(packed), 0644)
 	if err != nil {
 		HandleErr(err)
 	}
 
 }
-func packedFileName(path string) string {
+
+// FileName returns file name from given path and with given extension
+func FileName(path string, ext string) string {
 	fileName := filepath.Base(path)
-	return fmt.Sprintf("%s.%s", strings.TrimSuffix(fileName, filepath.Ext(fileName)), packedExtension)
+	return fmt.Sprintf("%s.%s", strings.TrimSuffix(fileName, filepath.Ext(fileName)), ext)
 }
 
 func init() {
-	packCmd.AddCommand(vlcCmd)
+	packCmd.AddCommand(vlcPackCmd)
 }

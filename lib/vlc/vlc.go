@@ -1,45 +1,15 @@
 package vlc
 
 import (
-	"fmt"
-	"strconv"
 	"strings"
 	"unicode"
-	"unicode/utf8"
 )
-
-type encodingTable map[rune]string
-type BinaryChunks []BinaryChunk
-type BinaryChunk string
-type HexChunk string
-type HexChunks []HexChunk
 
 const (
 	chunkSize = 8
 )
 
-func (bs BinaryChunks) ToHex() HexChunks {
-	res := make(HexChunks, 0, len(bs))
-	for _, chunk := range bs {
-		hChunk := chunk.ToHex()
-		res = append(res, hChunk)
-	}
-
-	return res
-}
-
-func (b BinaryChunk) ToHex() HexChunk {
-	num, err := strconv.ParseUint(string(b), 2, chunkSize)
-	if err != nil {
-		panic("can't parse chunk " + err.Error())
-	}
-	res := strings.ToUpper(fmt.Sprintf("%x", num))
-	if len(res) == 1 {
-		res = "0" + res
-	}
-	return HexChunk(res)
-}
-
+// Encode encodes string using vlc algorithm
 func Encode(str string) string {
 	// lower case with ! (M -> !m)
 	str = prepareText(str)
@@ -53,23 +23,15 @@ func Encode(str string) string {
 	return string(chunks.ToHex().ToString())
 }
 
-func (hchs HexChunks) ToString() string {
-	const separator = " "
-	switch len(hchs) {
-	case 0:
-		return ""
-	case 1:
-		return string(hchs[0])
-	}
-
-	var buf strings.Builder
-	buf.WriteString(string(hchs[0]))
-	for _, hch := range hchs[1:] {
-		buf.WriteString(separator)
-		buf.WriteString(string(hch))
-	}
-	return buf.String()
-
+// Decode decodes string that is product of vlc algorithm to text
+func Decode(str string) string {
+	bString := NewHexChunks(str).ToBin().Join()
+	// build decoding tree
+	bTree := getEncodingTable().DecodingTree()
+	// convert binary string to usual string
+	decodedStr := bTree.Decode(bString)
+	// return decoded string
+	return exportText(decodedStr)
 }
 
 // prepareText prepares text so all upper case letters
@@ -141,29 +103,21 @@ func getEncodingTable() encodingTable {
 	}
 }
 
-// splitByChunks splits binary string by chunks with given size
-func splitByChunks(bStr string, chunkSize int) BinaryChunks {
-	strLen := utf8.RuneCountInString(bStr)
-	chunksCount := strLen / chunkSize
-	if strLen/chunksCount != 0 {
-		chunksCount++
-	}
-	res := make(BinaryChunks, 0, chunksCount)
-
+// exportText export text ("!my name is !some!name" -> "My name is SomeName")
+func exportText(str string) string {
 	var buf strings.Builder
-
-	for ind, char := range bStr {
-		buf.WriteString(string(char))
-		if (ind+1)%chunkSize == 0 {
-			res = append(res, BinaryChunk(buf.String()))
-			buf.Reset()
+	var Capital bool
+	for _, ch := range str {
+		if ch == '!' {
+			Capital = true
+			continue
+		}
+		if Capital {
+			buf.WriteRune(unicode.ToUpper(ch))
+			Capital = false
+		} else {
+			buf.WriteRune(ch)
 		}
 	}
-
-	if buf.Len() != 0 {
-		lastChunk := buf.String()
-		lastChunk += strings.Repeat("0", chunkSize-len(lastChunk))
-		res = append(res, BinaryChunk(lastChunk))
-	}
-	return res
+	return buf.String()
 }
