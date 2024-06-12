@@ -37,7 +37,7 @@ func unpack(_ *cobra.Command, args []string) {
 	if err != nil {
 		HandleErr(err)
 	}
-	unpacked := vlc.Decode(string(data))
+	unpacked := vlc.Decode(data)
 	err = os.WriteFile(FileName(filePath, unpackedFileExtension), []byte(unpacked), 0644)
 	if err != nil {
 		HandleErr(err)

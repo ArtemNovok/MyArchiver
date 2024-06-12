@@ -10,7 +10,7 @@ const (
 )
 
 // Encode encodes string using vlc algorithm
-func Encode(str string) string {
+func Encode(str string) []byte {
 	// lower case with ! (M -> !m)
 	str = prepareText(str)
 	// encoding to binary
@@ -20,12 +20,12 @@ func Encode(str string) string {
 	chunks := splitByChunks(binStr, chunkSize)
 
 	// bytes to hex and return
-	return string(chunks.ToHex().ToString())
+	return chunks.Bytes()
 }
 
 // Decode decodes string that is product of vlc algorithm to text
-func Decode(str string) string {
-	bString := NewHexChunks(str).ToBin().Join()
+func Decode(bytes []byte) string {
+	bString := NewBinChunks(bytes).Join()
 	// build decoding tree
 	bTree := getEncodingTable().DecodingTree()
 	// convert binary string to usual string

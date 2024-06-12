@@ -79,93 +79,21 @@ func TestSpitByChunks(t *testing.T) {
 
 }
 
-func TestToHex(t *testing.T) {
-	tests := []struct {
-		name string
-		bcs  BinaryChunks
-		want HexChunks
-	}{
-		{
-			name: "happy path",
-			bcs:  BinaryChunks{"0101111", "10000000"},
-			want: HexChunks{"2F", "80"},
-		},
-	}
-	for _, test := range tests {
-		res := test.bcs.ToHex()
-		require.Equal(t, res, test.want)
-	}
-}
-
 func TestEncode(t *testing.T) {
 	tests := []struct {
 		name string
 		str  string
-		want string
+		want []byte
 	}{
 		{
 			name: "happy path",
 			str:  "My name is Ted",
-			want: "20 30 3C 18 77 4A E4 4D 28",
+			want: []byte{32, 48, 60, 24, 119, 74, 228, 77, 40},
 		},
 	}
 	for _, test := range tests {
 		res := Encode(test.str)
 		require.Equal(t, res, test.want)
-	}
-}
-
-func TestNewHexChunks(t *testing.T) {
-	tests := []struct {
-		name string
-		str  string
-		want HexChunks
-	}{
-		{
-			name: "happy path",
-			str:  "20 30 3C 18",
-			want: HexChunks{"20", "30", "3C", "18"},
-		},
-	}
-	for _, test := range tests {
-		res := NewHexChunks(test.str)
-		require.Equal(t, res, test.want)
-	}
-}
-
-func TestHChunkToBChunk(t *testing.T) {
-	tests := []struct {
-		name string
-		hch  HexChunk
-		bch  BinaryChunk
-	}{
-		{
-			name: "happy path",
-			hch:  HexChunk("2F"),
-			bch:  BinaryChunk("00101111"),
-		},
-	}
-	for _, test := range tests {
-		res := test.hch.ToBin()
-		require.Equal(t, res, test.bch)
-	}
-}
-
-func TestHChunskToBChunks(t *testing.T) {
-	tests := []struct {
-		name string
-		hch  HexChunks
-		bch  BinaryChunks
-	}{
-		{
-			name: "happy path",
-			hch:  HexChunks{"2F", "80"},
-			bch:  BinaryChunks{"00101111", "10000000"},
-		},
-	}
-	for _, test := range tests {
-		res := test.hch.ToBin()
-		require.Equal(t, res, test.bch)
 	}
 }
 
@@ -208,17 +136,35 @@ func TestExportText(t *testing.T) {
 func TestDecode(t *testing.T) {
 	tests := []struct {
 		name string
-		str  string
+		data []byte
 		want string
 	}{
 		{
 			name: "Happy path",
-			str:  "20 30 3C 18 77 4A E4 4D 28",
+			data: []byte{32, 48, 60, 24, 119, 74, 228, 77, 40},
 			want: "My name is Ted",
 		},
 	}
 	for _, test := range tests {
-		res := Decode(test.str)
+		res := Decode(test.data)
+		require.Equal(t, res, test.want)
+	}
+}
+
+func TestNewBinChunks(t *testing.T) {
+	tests := []struct {
+		name string
+		data []byte
+		want BinaryChunks
+	}{
+		{
+			name: "happy path",
+			data: []byte{20, 30, 60, 18},
+			want: BinaryChunks{"00010100", "00011110", "00111100", "00010010"},
+		},
+	}
+	for _, test := range tests {
+		res := NewBinChunks(test.data)
 		require.Equal(t, res, test.want)
 	}
 }
