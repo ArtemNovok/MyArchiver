@@ -26,7 +26,7 @@ type code struct {
 	Size     int
 }
 
-func (g Generator) NewTabel(text string) table.EncodingTable {
+func (g Generator) NewTable(text string) table.EncodingTable {
 	// char  appearance
 	stat := newCharStat(text)
 	// encoding table

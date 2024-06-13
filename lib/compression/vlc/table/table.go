@@ -3,7 +3,7 @@ package table
 import "strings"
 
 type Generator interface {
-	NewTabel(text string) EncodingTable
+	NewTable(text string) EncodingTable
 }
 
 type decodingTree struct {
@@ -13,6 +13,12 @@ type decodingTree struct {
 }
 
 type EncodingTable map[rune]string
+
+func (et EncodingTable) Decode(str string) string {
+	dt := et.DecodingTree()
+
+	return dt.Decode(str)
+}
 
 func (dt *decodingTree) Decode(str string) string {
 	var buf strings.Builder

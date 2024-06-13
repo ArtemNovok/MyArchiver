@@ -5,6 +5,7 @@ import (
 	"io"
 	"myarchiver/lib/compression"
 	"myarchiver/lib/compression/vlc"
+	shennofanno "myarchiver/lib/compression/vlc/table/shenno_fanno"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -32,7 +33,7 @@ func unpack(cmd *cobra.Command, args []string) {
 	method := cmd.Flag("method").Value.String()
 	switch method {
 	case "vlc":
-		dec = vlc.New()
+		dec = vlc.New(shennofanno.NewGenerator())
 	default:
 		cmd.PrintErr("unknown method")
 	}
