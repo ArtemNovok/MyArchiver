@@ -9,8 +9,16 @@ const (
 	chunkSize = 8
 )
 
+type EncoderDecoder struct {
+}
+
+func New() EncoderDecoder {
+	return EncoderDecoder{}
+}
+
 // Encode encodes string using vlc algorithm
-func Encode(str string) []byte {
+func (_ EncoderDecoder) Encode(str string) []byte {
+
 	// lower case with ! (M -> !m)
 	str = prepareText(str)
 	// encoding to binary
@@ -24,7 +32,7 @@ func Encode(str string) []byte {
 }
 
 // Decode decodes string that is product of vlc algorithm to text
-func Decode(bytes []byte) string {
+func (_ EncoderDecoder) Decode(bytes []byte) string {
 	bString := NewBinChunks(bytes).Join()
 	// build decoding tree
 	bTree := getEncodingTable().DecodingTree()

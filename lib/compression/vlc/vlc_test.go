@@ -82,17 +82,19 @@ func TestSpitByChunks(t *testing.T) {
 func TestEncode(t *testing.T) {
 	tests := []struct {
 		name string
+		ed   EncoderDecoder
 		str  string
 		want []byte
 	}{
 		{
 			name: "happy path",
+			ed:   EncoderDecoder{},
 			str:  "My name is Ted",
 			want: []byte{32, 48, 60, 24, 119, 74, 228, 77, 40},
 		},
 	}
 	for _, test := range tests {
-		res := Encode(test.str)
+		res := test.ed.Encode(test.str)
 		require.Equal(t, res, test.want)
 	}
 }
@@ -136,17 +138,19 @@ func TestExportText(t *testing.T) {
 func TestDecode(t *testing.T) {
 	tests := []struct {
 		name string
+		ed   EncoderDecoder
 		data []byte
 		want string
 	}{
 		{
 			name: "Happy path",
+			ed:   EncoderDecoder{},
 			data: []byte{32, 48, 60, 24, 119, 74, 228, 77, 40},
 			want: "My name is Ted",
 		},
 	}
 	for _, test := range tests {
-		res := Decode(test.data)
+		res := test.ed.Decode(test.data)
 		require.Equal(t, res, test.want)
 	}
 }
