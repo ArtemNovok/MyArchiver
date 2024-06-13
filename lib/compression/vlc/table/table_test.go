@@ -1,4 +1,4 @@
-package vlc
+package table
 
 import (
 	"testing"
@@ -9,35 +9,35 @@ import (
 func TestDecodingTree(t *testing.T) {
 	tests := []struct {
 		name string
-		et   encodingTable
-		want DecodingTree
+		et   EncodingTable
+		want decodingTree
 	}{
 		{
 			name: "base tree test",
-			et: encodingTable{
+			et: EncodingTable{
 				'a': "11",
 				'b': "1001",
 				'z': "0101",
 			},
-			want: DecodingTree{
-				Zero: &DecodingTree{
-					One: &DecodingTree{
-						Zero: &DecodingTree{
-							One: &DecodingTree{
+			want: decodingTree{
+				Zero: &decodingTree{
+					One: &decodingTree{
+						Zero: &decodingTree{
+							One: &decodingTree{
 								Value: "z",
 							},
 						},
 					},
 				},
-				One: &DecodingTree{
-					Zero: &DecodingTree{
-						Zero: &DecodingTree{
-							One: &DecodingTree{
+				One: &decodingTree{
+					Zero: &decodingTree{
+						Zero: &decodingTree{
+							One: &decodingTree{
 								Value: "b",
 							},
 						},
 					},
-					One: &DecodingTree{
+					One: &decodingTree{
 						Value: "a",
 					},
 				},

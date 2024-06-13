@@ -7,7 +7,6 @@ import (
 	"unicode/utf8"
 )
 
-type encodingTable map[rune]string
 type BinaryChunks []BinaryChunk
 type BinaryChunk string
 
